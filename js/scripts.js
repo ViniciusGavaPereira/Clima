@@ -4,279 +4,108 @@ $(function(){
 // *** APIs ***
 // clima, previsão 12 horas e previsão 5 dias: https://developer.accuweather.com/apis
 // pegar coordenadas geográficas pelo nome da cidade: https://docs.mapbox.com/api/
-// pegar coordenadas do IP: http://www.geoplugin.net - FEITO
+// pegar coordenadas do IP: http://www.geoplugin.net 
 // gerar gráficos em JS: https://www.highcharts.com/demo
 
 });
 
+var apiKey = 'BIynJyTKS3KGaGLCNJmdP03f4UHB8WLb';
+
+var mapboxTolken = "pk.eyJ1IjoidmluaWdhdmFwZXJlaXJhIiwiYSI6ImNra3B5NzFmNDB2azcydm52Nm56eDg2NXQifQ.VMawZ8Ya4EddjcqHqyHxiA";
+
+var objetoClima = {
+  
+  estado: "",
+  pais: "",
+  temperatura: "",
+  textoClima: "",
+  iconeClima: "",
+
+
+}
+
+
+
+var diaSemana = ["Domingo", "Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sabado"]
+
 // API's testes:
 
-var Proximoscinco = {
-  "Headline": {
-    "EffectiveDate": "2021-01-23T13:00:00-03:00",
-    "EffectiveEpochDate": 1611417600,
-    "Severity": 5,
-    "Text": "Previsão de pancadas de chuva Sábado à tarde",
-    "Category": "rain",
-    "EndDate": "2021-01-23T19:00:00-03:00",
-    "EndEpochDate": 1611439200,
-    "MobileLink": "http://m.accuweather.com/pt/br/sao-paulo/45881/extended-weather-forecast/45881?lang=pt-br",
-    "Link": "http://www.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?lang=pt-br"
-  },
-  "DailyForecasts": [
-    {
-      "Date": "2021-01-21T07:00:00-03:00",
-      "EpochDate": 1611223200,
-      "Temperature": {
-        "Minimum": {
-          "Value": 69,
-          "Unit": "F",
-          "UnitType": 18
-        },
-        "Maximum": {
-          "Value": 81,
-          "Unit": "F",
-          "UnitType": 18
-        }
+
+
+
+// API's:
+
+function preencherClimaAgora(estado, pais, temperatura, texto_clima, icone_clima){
+    var texto_local = estado + ", " + pais + ".";
+    $("#texto_local").html(texto_local);
+    $("#texto_climma").html(texto_clima);
+    $("#texto_temperatura").html(temperatura + "&deg;");
+    $("#icone_clima").css("background-image", "url('" + icone_clima + "')")
+
+
+}
+
+function clima(localCode){
+  $.ajax({
+      type: "GET",
+      // Url correta, para fazer a busca, basa chamar a função clima()
+      url: "http://dataservice.accuweather.com/currentconditions/v1/" + localCode + "?apikey=" + apiKey + "&language=PT-BR",
+      datatype: "json",
+      success: function(clima){
+
+        objetoClima.temperatura = clima[0].Temperature.Metric.Value;
+        objetoClima.textoClima = clima[0].WeatherText;
+
+        var iconNumber = clima[0].WeatherIcon <= 9 ? "0" + String(clima[0].WeatherIcon) : String(clima[0].WeatherIcon);
+
+        objetoClima.iconeClima = "https://developer.accuweather.com/sites/default/files/" + iconNumber  + "-s.png"
+        preencherClimaAgora(objetoClima.estado, objetoClima.pais, objetoClima.temperatura, objetoClima.textoClima, objetoClima.iconeClima)
       },
-      "Day": {
-        "Icon": 15,
-        "IconPhrase": "Tempestades",
-        "HasPrecipitation": true,
-        "PrecipitationType": "Rain",
-        "PrecipitationIntensity": "Moderate"
-      },
-      "Night": {
-        "Icon": 36,
-        "IconPhrase": "Nuvens esparsas",
-        "HasPrecipitation": false
-      },
-      "Sources": [
-        "AccuWeather"
-      ],
-      "MobileLink": "http://m.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=1&lang=pt-br",
-      "Link": "http://www.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=1&lang=pt-br"
-    },
-    {
-      "Date": "2021-01-22T07:00:00-03:00",
-      "EpochDate": 1611309600,
-      "Temperature": {
-        "Minimum": {
-          "Value": 68,
-          "Unit": "F",
-          "UnitType": 18
-        },
-        "Maximum": {
-          "Value": 80,
-          "Unit": "F",
-          "UnitType": 18
-        }
-      },
-      "Day": {
-        "Icon": 17,
-        "IconPhrase": "Parcialmente nublado, com tempestades",
-        "HasPrecipitation": true,
-        "PrecipitationType": "Rain",
-        "PrecipitationIntensity": "Moderate"
-      },
-      "Night": {
-        "Icon": 35,
-        "IconPhrase": "Parcialmente nublado",
-        "HasPrecipitation": false
-      },
-      "Sources": [
-        "AccuWeather"
-      ],
-      "MobileLink": "http://m.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=2&lang=pt-br",
-      "Link": "http://www.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=2&lang=pt-br"
-    },
-    {
-      "Date": "2021-01-23T07:00:00-03:00",
-      "EpochDate": 1611396000,
-      "Temperature": {
-        "Minimum": {
-          "Value": 69,
-          "Unit": "F",
-          "UnitType": 18
-        },
-        "Maximum": {
-          "Value": 79,
-          "Unit": "F",
-          "UnitType": 18
-        }
-      },
-      "Day": {
-        "Icon": 12,
-        "IconPhrase": "Pancadas de chuva",
-        "HasPrecipitation": true,
-        "PrecipitationType": "Rain",
-        "PrecipitationIntensity": "Heavy"
-      },
-      "Night": {
-        "Icon": 35,
-        "IconPhrase": "Parcialmente nublado",
-        "HasPrecipitation": false
-      },
-      "Sources": [
-        "AccuWeather"
-      ],
-      "MobileLink": "http://m.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=3&lang=pt-br",
-      "Link": "http://www.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=3&lang=pt-br"
-    },
-    {
-      "Date": "2021-01-24T07:00:00-03:00",
-      "EpochDate": 1611482400,
-      "Temperature": {
-        "Minimum": {
-          "Value": 70,
-          "Unit": "F",
-          "UnitType": 18
-        },
-        "Maximum": {
-          "Value": 81,
-          "Unit": "F",
-          "UnitType": 18
-        }
-      },
-      "Day": {
-        "Icon": 4,
-        "IconPhrase": "Nuvens esparsas",
-        "HasPrecipitation": true,
-        "PrecipitationType": "Rain",
-        "PrecipitationIntensity": "Moderate"
-      },
-      "Night": {
-        "Icon": 35,
-        "IconPhrase": "Parcialmente nublado",
-        "HasPrecipitation": false
-      },
-      "Sources": [
-        "AccuWeather"
-      ],
-      "MobileLink": "http://m.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=4&lang=pt-br",
-      "Link": "http://www.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=4&lang=pt-br"
-    },
-    {
-      "Date": "2021-01-25T07:00:00-03:00",
-      "EpochDate": 1611568800,
-      "Temperature": {
-        "Minimum": {
-          "Value": 69,
-          "Unit": "F",
-          "UnitType": 18
-        },
-        "Maximum": {
-          "Value": 81,
-          "Unit": "F",
-          "UnitType": 18
-        }
-      },
-      "Day": {
-        "Icon": 6,
-        "IconPhrase": "Predominantemente nublado",
-        "HasPrecipitation": true,
-        "PrecipitationType": "Rain",
-        "PrecipitationIntensity": "Light"
-      },
-      "Night": {
-        "Icon": 38,
-        "IconPhrase": "Predominantemente nublado",
-        "HasPrecipitation": true,
-        "PrecipitationType": "Rain",
-        "PrecipitationIntensity": "Light"
-      },
-      "Sources": [
-        "AccuWeather"
-      ],
-      "MobileLink": "http://m.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=5&lang=pt-br",
-      "Link": "http://www.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=5&lang=pt-br"
-    }
-  ]
+      error: function(){
+          console.log("Algo deu errado com o IP")
+      }, 
+  
+  
+  })
+  
 }
 
 
-var ObjetoProvisório = {
-
-    "Headline": {
-      "EffectiveDate": "2021-01-23T13:00:00-03:00",
-      "EffectiveEpochDate": 1611417600,
-      "Severity": 5,
-      "Text": "Previsão de pancadas de chuva Sábado à tarde",
-      "Category": "rain",
-      "EndDate": "2021-01-23T19:00:00-03:00",
-      "EndEpochDate": 1611439200,
-      "MobileLink": "http://m.accuweather.com/pt/br/sao-paulo/45881/extended-weather-forecast/45881?lang=pt-br",
-      "Link": "http://www.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?lang=pt-br"
-    },
-    "DailyForecasts": [
-      {
-        "Date": "2021-01-20T07:00:00-03:00",
-        "EpochDate": 1611136800,
-        "Temperature": {
-          "Minimum": {
-            "Value": 69,
-            "Unit": "F",
-            "UnitType": 18
-          },
-          "Maximum": {
-            "Value": 80,
-            "Unit": "F",
-            "UnitType": 18
-          }
-        },
-        "Day": {
-          "Icon": 17,
-          "IconPhrase": "Parcialmente nublado, com tempestades",
-          "HasPrecipitation": true,
-          "PrecipitationType": "Rain",
-          "PrecipitationIntensity": "Moderate"
-        },
-        "Night": {
-          "Icon": 41,
-          "IconPhrase": "Parcialmente nublado com tempestades",
-          "HasPrecipitation": true,
-          "PrecipitationType": "Rain",
-          "PrecipitationIntensity": "Light"
-        },
-        "Sources": [
-          "AccuWeather"
-        ],
-        "MobileLink": "http://m.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=1&lang=pt-br",
-        "Link": "http://www.accuweather.com/pt/br/sao-paulo/45881/daily-weather-forecast/45881?day=1&lang=pt-br"
-      }
-    ]
-}
-
-
-
-// API's
-function IP(callback){
+function localização(lat, long){
 
     $.ajax({
         type: "GET",
-        url: "http://www.geoplugin.net/json.gp?",
+        url: "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey=" + apiKey + "&q=" + lat + "%2C" + long + "&language=PT-BR",
         datatype: "json",
-        success: function(dados){
-            callback(dados)
+        success: function(local){
 
+          objetoClima.estado = local.AdministrativeArea.LocalizedName;
+          objetoClima.pais = local.Country.LocalizedName;
+          objetoClima.iconeClima = "" ;
+          var local_code = local.Key;
+
+          clima(local_code);
+          proximosDias(local_code);
+          pegarPrevisãoHoraAHora(local_code)
         },
         error: function(){
-            console.log("Algo deu errado com o IP")
+            console.log("Algo deu errado com a API' IP")
         }, 
 
 
     })
 }
 
-function cidade(callback){
+function pegarcordenadasdoIP(){
 
     $.ajax({
         type: "GET",
-        url: "https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.js",
+        url: "http://www.geoplugin.net/json.gp",
         datatype: "json",
         success: function(cidade){
-            console.log(cidade)
-
+          loader()
+          localização(cidade.geoplugin_latitude, cidade.geoplugin_longitude)
+  
         },
         error: function(){
             console.log("Algo deu errado com a cidade")
@@ -287,35 +116,139 @@ function cidade(callback){
 
 }
 
-function clima(callback){
+function pegarCordenadasDaPesquisa(input){
+  input = encodeURI(input)
+  $.ajax({
+    type: "GET",
+    url: "https://api.mapbox.com/geocoding/v5/mapbox.places/" + input + ".json?access_token=" + mapboxTolken + "",
+    datatype: "json",
+    success: function(cordenadas){
+    
+      let longitude = cordenadas.features[0].geometry.coordinates[0];
+      let latitude = cordenadas.features[0].geometry.coordinates[1];
+      loader()
+      localização(latitude,longitude)
+    },
+    error: function(){
+        console.log("Algo deu errado com a API das cordenadas")
+    }, 
 
-    $.ajax({
-        type: "GET",
-        // Url correta, para fazer a busca, basa chamar a função clima()
-        url: "http://dataservice.accuweather.com/currentconditions/v1/45881?apikey=BIynJyTKS3KGaGLCNJmdP03f4UHB8WLb&language=PT-BR",
-        datatype: "json",
-        success: function(clima){
-          callback(clima)
 
-        },
-        error: function(){
-            console.log("Algo deu errado com o IP")
-        }, 
+})
+
+}
+
+// pegarcordenadasdoIP()
+
+function proximosDias(localCode){
+  $.ajax({
+    type: "GET",
+    url:  "http://dataservice.accuweather.com/forecasts/v1/daily/5day/" + localCode + "?apikey=" +  apiKey  + "&language=PT-BR&metric=true",
+    datatype: "json",
+    success: function(clima){
+      $("#texto_max_min").html(clima.DailyForecasts[0].Temperature.Minimum.Value.toFixed(0) + "° / " + clima.DailyForecasts[0].Temperature.Maximum.Value.toFixed(0) + "°" )
+
+      let dia = new Date().getDay();
+      let hora = new Date().getHours();
+      let frontBaixo = $(".dayname");
+      let minMax = $(".max_min_temp");
+      let iconeBaixo = $(".daily_weather_icon");
+      let z = 0
+
+      
+      for(let y = 0; y < clima.DailyForecasts.length; y++){
+
+        let dia_semana = diaSemana[dia + y];
+        
+        $(minMax[y + 1]).html(clima.DailyForecasts[y].Temperature.Minimum.Value.toFixed(0) + "° / " + clima.DailyForecasts[y].Temperature.Maximum.Value.toFixed(0) + "°")
+
+        if(dia_semana ==  undefined){
+           dia_semana_paralelo = diaSemana[0 + z];
+           $(frontBaixo[y]).html(dia_semana_paralelo);
+           z++
+        }else{
+          $(frontBaixo[y]).html(dia_semana);
+        }
 
 
-    })
+
+        if(hora >= 18 && hora < 6){
+
+          let iconNumber = clima.DailyForecasts[y].Night.Icon <= 9 ? "0" + String(clima.DailyForecasts[y].Night.Icon) : String(clima.DailyForecasts[y].Night.Icon);
+
+          let iconeClima = "https://developer.accuweather.com/sites/default/files/" + iconNumber  + "-s.png"
+           
+          $(iconeBaixo[y]).css("background-image", "url(" + iconeClima + ")")
+  
+         }else{
+          
+          let iconNumber = clima.DailyForecasts[y].Day.Icon <= 9 ? "0" + String(clima.DailyForecasts[y].Day.Icon) : String(clima.DailyForecasts[y].Day.Icon);
+
+          let iconeClima = "https://developer.accuweather.com/sites/default/files/" + iconNumber  + "-s.png"
+           
+          $(iconeBaixo[y]).css("background-image", "url(" + iconeClima + ")")
+  
+  
+        }
+        
+       
+        } 
+
+
+    },
+    error: function(){
+        console.log("Algo deu errado com o próximos dias.")
+    }, 
+
+
+})
 }
 
 
 // Funções: 
 
-  // Variáveis de controle:
-    var tempMinima = ObjetoProvisório.DailyForecasts[0].Temperature.Minimum.Value;
-    var tempMaxima = ObjetoProvisório.DailyForecasts[0].Temperature.Maximum.Value;
-    var média = (tempMinima + tempMaxima) / 2;
-    var semana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+function frontPrincipal(clima){
+
+  $("#texto_temperatura").html(clima[0].Temperature.Metric.Value);
+  $("#texto_clima").html(clima.WeatherText);
+  $("#icone_clima").css("background-image", "url('https://developer.accuweather.com/sites/default/files/0" + clima[0].WeatherIcon  + "-s.png')");
+
+}
 
 
+function acrescentarOutrosDias(previsão){
+  
+   let hora = new Date;
+
+  let tempMinima = previsão.DailyForecasts[0].Temperature.Minimum.Value;
+  let tempMaxima = previsão.DailyForecasts[0].Temperature.Maximum.Value;
+  let média = (tempMinima + tempMaxima) / 2;
+  var semana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+
+  if(hora.getHours() >= 18){
+    
+    
+    console.log("Noite");
+    $("#icone_clima").css("background-image", "url('https://developer.accuweather.com/sites/default/files/" + previsão.DailyForecasts[0].Night.Icon  + "-s.png')");
+    $("#texto_temperatura").html(calculo(previsão,0));
+    //front_dias_seguintes('Night')
+
+
+    
+    $("#texto_max_min").html(((tempMinima - 32) * 5/9).toFixed(0) + "° / " + ((tempMaxima - 32) * 5/9).toFixed(0) + "°" );
+
+
+  }else{
+      console.log("Dia"); 
+      $("#icone_clima").css("background-image", "url('https://developer.accuweather.com/sites/default/files/" + previsão.DailyForecasts[0].Day.Icon  + "-s.png')");
+      $("#texto_temperatura").html(calculo(previsão,0))
+     // front_dias_seguintes('Day')
+
+      $("#texto_max_min").html(((tempMinima - 32) * 5/9).toFixed(0) + "° / " + ((tempMaxima - 32) * 5/9).toFixed(0) + "°" );
+
+    }
+ 
+}
 
 function calculo(objeto,number){
 
@@ -328,12 +261,13 @@ function calculo(objeto,number){
 
 }
 
+// Libere esta função para abrir o  Front-end principal: clima(frontPrincipal)
 
-function acrescentarAtual(dados){
 
-    let hora = new Date;
 
-    
+function acrescentarAtual(clima){
+
+    let hora = new Date;    
 
     if(hora.getHours() >= 18){
         $("#texto_local").html(dados.geoplugin_city + ", " + dados.geoplugin_countryName);
@@ -362,7 +296,7 @@ function acrescentarAtual(dados){
 
 }
 
-function acrescentarOutrosDias(dados){
+function acrescentarOutrosDias(previsão){
   
   let hora = new Date;
 
@@ -440,22 +374,63 @@ function front_dias_seguintes(string){
 
 }
 
+// Tudo comentado abaixo:
 
-function gerar_graficos(){
+
+function pegarPrevisãoHoraAHora(local_code){
+  // Url: "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/45881?apikey=BIynJyTKS3KGaGLCNJmdP03f4UHB8WLb&language=PT-BR&metric=True"
+
+
+  $.ajax({
+
+    type: "GET", 
+    url:  "http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/" + local_code + "?apikey=" + apiKey + "&language=PT-BR&metric=True",
+    datatype: "json",
+    success: function(previsãoHora){
+
+      let horários = [];
+      let temperatura = [];
+
+       for(let a = 0; a < previsãoHora.length; a++){
+        
+        let hora = new Date(previsãoHora[a].DateTime).getHours();
+
+        horários.push(String(hora) + "h");
+
+        temperatura.push(previsãoHora[a].Temperature.Value)
+
+        gerar_graficos(horários,temperatura)
+
+
+      }
+ 
+    },
+    error: function(){
+      console.log("A api de pegar a previsão hora a hora deu errado!")
+
+     },
+  
+  })    
+}
+
+
+
+function gerar_graficos(horas,temperaturas){
 
     Highcharts.chart('hourly_chart', {
       chart: {
           type: 'line'
       },
       title: {
-          text: 'Temperatura dos próximos dias'
+          text: 'Temperatura hora a hora'
       },
       xAxis: {
-          categories: [ semana[new Date(Proximoscinco.DailyForecasts[0].Date).getDay()], semana[new Date(Proximoscinco.DailyForecasts[1].Date).getDay()], semana[new Date(Proximoscinco.DailyForecasts[2].Date).getDay()], semana[new Date(Proximoscinco.DailyForecasts[3].Date).getDay()], semana[new Date(Proximoscinco.DailyForecasts[4].Date).getDay()]]
+          categories: horas
       },
       yAxis: {
           title: {
               text: 'Temperatura (°C)'
+              
           }
       },
       plotOptions: {
@@ -469,18 +444,40 @@ function gerar_graficos(){
       series: [{
         // Aqui ainda precisa colocar de forma dinâmica 
           name: 'São Paulo',
-          data: [parseInt(calculo(Proximoscinco,0)), parseInt(calculo(Proximoscinco,1)), parseInt(calculo(Proximoscinco,2)), parseInt(calculo(Proximoscinco,3)), parseInt(calculo(Proximoscinco,4))]
+          data: temperaturas
       }]
   });
 }
-
-IP(acrescentarOutrosDias);
-IP(acrescentarAtual);
-gerar_graficos()
+ 
 
 
+pegarcordenadasdoIP();
 
+$("#search-button").click(function(){
+    var local = $("input#local").val();
+  if(local){
+    pegarCordenadasDaPesquisa(local);
+  }else{
+    alert("Local inválido")
+  }
+})
 
+$("input#local").on('keypress',function(e){
+  if(e.which == 13){
 
+    var local = $("input#local").val();
+    if(local){
+      pegarCordenadasDaPesquisa(local);
+    }else{
+      alert("Local inválido")
+    }
+  }
+})
 
+function loader(){
+  $(".refresh-loader").fadeIn()
+      setInterval(function(){
+      $(".refresh-loader").fadeOut()
 
+  },2000)
+}
